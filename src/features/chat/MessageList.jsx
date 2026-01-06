@@ -1,3 +1,53 @@
+import { useState } from 'react';
+import { translateText } from '../../api/translation';
+
+// Translate icon
+function TranslateIcon({ className }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 8l6 6" />
+      <path d="M4 14l6-6 2-3" />
+      <path d="M2 5h12" />
+      <path d="M7 2h1" />
+      <path d="M22 22l-5-10-5 10" />
+      <path d="M14 18h6" />
+    </svg>
+  );
+}
+
+// Loading spinner icon
+function LoadingSpinner({ className }) {
+  return (
+    <svg
+      className={`${className} animate-spin`}
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="3"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+  );
+}
+
 // Avatar component for AI assistant
 function BuddyAvatar() {
   return (
@@ -165,50 +215,156 @@ function EmptyState() {
 // Single message bubble
 function MessageBubble({ message, isLast }) {
   const isUser = message.role === 'user';
+  const [translatedText, setTranslatedText] = useState(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [translationError, setTranslationError] = useState(null);
+
+  const handleTranslate = async () => {
+    // 如果已经有翻译结果，点击隐藏
+    if (translatedText) {
+      setTranslatedText(null);
+      return;
+    }
+
+    setIsTranslating(true);
+    setTranslationError(null);
+
+    try {
+      const result = await translateText(message.content);
+      setTranslatedText(result.translatedText);
+    } catch (error) {
+      console.error('Translation failed:', error);
+      setTranslationError('翻译失败，请稍后重试');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   return (
     <div
-      className={`flex items-end gap-3 ${isUser ? 'flex-row-reverse' : ''} ${isLast ? 'animate-fade-in' : ''}`}
+      className={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : ''} ${isLast ? 'animate-fade-in' : ''}`}
     >
       {/* Avatar */}
       {isUser ? <UserAvatar /> : <BuddyAvatar />}
 
-      {/* Message content */}
-      <div
-        className={`relative max-w-[75%] px-5 py-3.5 ${
-          isUser
+      {/* Message content wrapper */}
+      <div className={`flex flex-col max-w-[75%] ${isUser ? 'items-end' : 'items-start'}`}>
+        {/* Message bubble */}
+        <div
+          className={`relative px-5 py-3.5 ${isUser
             ? 'rounded-2xl rounded-br-md'
             : 'rounded-2xl rounded-bl-md'
-        }`}
-        style={
-          isUser
-            ? {
+            }`}
+          style={
+            isUser
+              ? {
                 background: 'linear-gradient(135deg, var(--forest-600) 0%, var(--forest-700) 100%)',
                 color: 'white',
                 boxShadow: '0 2px 12px rgba(45, 90, 74, 0.15)',
               }
-            : {
+              : {
                 background: 'white',
                 border: '1px solid var(--border-light)',
                 color: 'var(--text-primary)',
                 boxShadow: 'var(--shadow-sm)',
               }
-        }
-      >
-        <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
-          {message.content}
-        </p>
-
-        {/* Timestamp (optional visual element) */}
-        <div
-          className={`text-[10px] mt-1.5 ${isUser ? 'text-right' : 'text-left'}`}
-          style={{
-            opacity: 0.6,
-            color: isUser ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)',
-          }}
+          }
         >
-          {new Date(message.id).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
+            {message.content}
+          </p>
+
+          {/* Timestamp (optional visual element) */}
+          <div
+            className={`text-[10px] mt-1.5 ${isUser ? 'text-right' : 'text-left'}`}
+            style={{
+              opacity: 0.6,
+              color: isUser ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)',
+            }}
+          >
+            {new Date(message.id).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
+
+        {/* Action bar - 功能区 */}
+        <div
+          className={`flex items-center gap-1 mt-2 ${isUser ? 'flex-row-reverse' : ''}`}
+          style={{ paddingLeft: isUser ? 0 : '4px', paddingRight: isUser ? '4px' : 0 }}
+        >
+          {/* Translate button */}
+          <button
+            onClick={handleTranslate}
+            disabled={isTranslating}
+            className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all duration-200 hover:scale-105"
+            style={{
+              background: translatedText
+                ? 'linear-gradient(135deg, var(--forest-500) 0%, var(--forest-600) 100%)'
+                : 'rgba(0, 0, 0, 0.04)',
+              color: translatedText ? 'white' : 'var(--text-muted)',
+              border: translatedText ? 'none' : '1px solid transparent',
+            }}
+            onMouseEnter={(e) => {
+              if (!translatedText) {
+                e.currentTarget.style.background = 'rgba(45, 90, 74, 0.1)';
+                e.currentTarget.style.color = 'var(--forest-600)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!translatedText) {
+                e.currentTarget.style.background = 'rgba(0, 0, 0, 0.04)';
+                e.currentTarget.style.color = 'var(--text-muted)';
+              }
+            }}
+            title={translatedText ? '隐藏翻译' : '翻译'}
+          >
+            {isTranslating ? (
+              <LoadingSpinner className="w-4 h-4" />
+            ) : (
+              <TranslateIcon className="w-4 h-4" />
+            )}
+            <span className="text-xs font-medium">
+              {translatedText ? '隐藏' : '翻译'}
+            </span>
+          </button>
+        </div>
+
+        {/* Translation result - 翻译结果显示区 */}
+        {(translatedText || translationError) && (
+          <div
+            className="mt-2 px-4 py-3 rounded-xl animate-fade-in"
+            style={{
+              background: translationError
+                ? 'rgba(239, 68, 68, 0.08)'
+                : 'linear-gradient(135deg, rgba(45, 90, 74, 0.06) 0%, rgba(45, 90, 74, 0.12) 100%)',
+              border: translationError
+                ? '1px solid rgba(239, 68, 68, 0.2)'
+                : '1px solid rgba(45, 90, 74, 0.15)',
+              maxWidth: '100%',
+            }}
+          >
+            {translationError ? (
+              <p className="text-sm" style={{ color: 'rgb(239, 68, 68)' }}>
+                {translationError}
+              </p>
+            ) : (
+              <>
+                <div
+                  className="flex items-center gap-1.5 mb-1.5"
+                  style={{ color: 'var(--forest-600)' }}
+                >
+                  <TranslateIcon className="w-3.5 h-3.5" />
+                  <span className="text-xs font-medium">翻译</span>
+                </div>
+                <p
+                  className="text-[14px] leading-relaxed"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {translatedText}
+                </p>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
