@@ -23,6 +23,24 @@ function BookIcon({ className }) {
   );
 }
 
+function TrashIcon({ className }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+    </svg>
+  );
+}
+
 // Decorative element - stylized quotation mark
 function QuoteDecoration() {
   return (
@@ -35,7 +53,7 @@ function QuoteDecoration() {
 }
 
 export default function ChatPage() {
-  const { messages, sendMessage, isLoading } = useChat();
+  const { messages, sendMessage, isLoading, clearMemory } = useChat();
   const messagesEndRef = useRef(null);
   const mainRef = useRef(null);
 
@@ -60,34 +78,44 @@ export default function ChatPage() {
           <QuoteDecoration />
 
           {/* Logo & Title */}
-          <div className="flex items-center gap-4">
-            <div
-              className="flex items-center justify-center w-12 h-12 rounded-xl"
-              style={{
-                background: 'linear-gradient(135deg, var(--forest-600) 0%, var(--forest-700) 100%)',
-                boxShadow: '0 4px 12px rgba(45, 90, 74, 0.25)',
-              }}
-            >
-              <BookIcon className="w-6 h-6 text-white" />
-            </div>
-
-            <div>
-              <h1
-                className="text-2xl md:text-3xl font-semibold tracking-tight"
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div
+                className="flex items-center justify-center w-12 h-12 rounded-xl"
                 style={{
-                  fontFamily: 'var(--font-display)',
-                  color: 'var(--text-primary)',
+                  background: 'linear-gradient(135deg, var(--forest-600) 0%, var(--forest-700) 100%)',
+                  boxShadow: '0 4px 12px rgba(45, 90, 74, 0.25)',
                 }}
               >
-                En-Buddy
-              </h1>
-              <p
-                className="text-sm mt-0.5"
-                style={{ color: 'var(--text-muted)' }}
-              >
-                Your personal English learning companion
-              </p>
+                <BookIcon className="w-6 h-6 text-white" />
+              </div>
+
+              <div>
+                <h1
+                  className="text-2xl md:text-3xl font-semibold tracking-tight"
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  En-Buddy
+                </h1>
+                <p
+                  className="text-sm mt-0.5"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Your personal English learning companion
+                </p>
+              </div>
             </div>
+
+            <button
+              onClick={clearMemory}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-red-500"
+              title="Clear Chat Memory"
+            >
+              <TrashIcon className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Decorative line */}
