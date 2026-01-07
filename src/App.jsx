@@ -1,10 +1,11 @@
+import { RouterProvider } from 'react-router-dom';
 import { AppProvider } from './store';
-import { ChatPage } from './features/chat';
+import { router } from './router';
 
 function App() {
   return (
     <AppProvider>
-      <ChatPage />
+      <RouterProvider router={router} />
     </AppProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ChatInput from './ChatInput';
 import MessageList from './MessageList';
 import { useChat } from '../../hooks/useChat';
@@ -109,13 +110,25 @@ export default function ChatPage() {
               </div>
             </div>
 
-            <button
-              onClick={clearMemory}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-red-500"
-              title="Clear Chat Memory"
-            >
-              <TrashIcon className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                to="/playground"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                style={{
+                  color: 'var(--forest-600)',
+                  background: 'var(--sage-100)',
+                }}
+              >
+                Playground
+              </Link>
+              <button
+                onClick={clearMemory}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-red-500"
+                title="Clear Chat Memory"
+              >
+                <TrashIcon className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Decorative line */}
