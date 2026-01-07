@@ -1,14 +1,23 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { chatStream, clearMemory } from '../api/chat';
 
-const generateSessionId = () => `user-${Date.now()}`;
-
-export function useChat() {
+export function useChat(activeSessionId) {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const sessionIdRef = useRef(generateSessionId());
+
+  // Use activeSessionId if provided, otherwise fallback to local ref (for backward compatibility or new unsaved chats)
+  // However, for the new design, we really want to rely on activeSessionId.
+  // If activeSessionId is null, we can't really chat essentially, or we generate one temporarily?
+  // Let's assume the consumer handles session creation if needed, or passes a temporary ID.
 
   const handleSendMessage = useCallback(async (content) => {
+    const currentSessionId = activeSessionId;
+
+    if (!currentSessionId) {
+      console.error("No active session ID");
+      return;
+    }
+
     const userMessage = {
       id: Date.now(),
       role: 'user',
@@ -22,7 +31,7 @@ export function useChat() {
     try {
       let fullContent = '';
 
-      await chatStream(sessionIdRef.current, content, (chunk) => {
+      await chatStream(currentSessionId, content, (chunk) => {
         fullContent += chunk;
 
         setMessages((prev) => {
@@ -72,19 +81,21 @@ export function useChat() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [activeSessionId]);
 
   const handleClearMemory = useCallback(async () => {
+    if (!activeSessionId) return;
     try {
-      await clearMemory(sessionIdRef.current);
+      await clearMemory(activeSessionId);
       setMessages([]);
     } catch (error) {
       console.error('Failed to clear memory:', error);
     }
-  }, []);
+  }, [activeSessionId]);
 
   return {
     messages,
+    setMessages, // Exposed for loading history
     sendMessage: handleSendMessage,
     clearMemory: handleClearMemory,
     isLoading,

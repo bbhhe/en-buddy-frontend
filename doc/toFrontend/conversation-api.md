@@ -218,6 +218,93 @@ Content-Type: application/json
 
 ---
 
+### 5. 获取会话消息历史
+
+获取指定会话的完整消息历史记录。
+
+**请求**
+
+```
+GET /api/conversations/{id}/messages
+```
+
+**路径参数**
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| id | number | 会话数据库ID |
+
+**请求示例**
+
+```
+GET /api/conversations/1/messages
+```
+
+**响应**
+
+| 状态码 | 说明 |
+|--------|------|
+| 200 | 成功返回消息列表 |
+| 404 | 会话不存在 |
+
+**响应数据**
+
+```json
+[
+  {
+    "id": 1,
+    "type": "USER",
+    "content": "Do I need a visa for Japan?",
+    "createdAt": "2024-01-20T10:00:00"
+  },
+  {
+    "id": 2,
+    "type": "AI",
+    "content": "Yes, most travelers need a visa...",
+    "createdAt": "2024-01-20T10:00:05"
+  },
+  {
+    "id": 3,
+    "type": "USER",
+    "content": "How long does it take?",
+    "createdAt": "2024-01-20T10:01:00"
+  }
+]
+```
+
+**响应字段说明**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | number | 消息ID |
+| type | string | 消息类型：USER（用户）、AI（助手）、SYSTEM（系统） |
+| content | string | 消息内容 |
+| createdAt | string | 创建时间（ISO 8601 格式） |
+
+---
+
+## 前端处理示例 (JavaScript)
+
+### 获取消息历史
+
+```javascript
+async function getConversationMessages(conversationId) {
+  const response = await fetch(`/api/conversations/${conversationId}/messages`);
+
+  if (!response.ok) {
+    throw new Error('获取消息历史失败');
+  }
+
+  return await response.json();
+}
+
+// 使用示例
+const messages = await getConversationMessages(1);
+console.log('消息历史:', messages);
+```
+
+---
+
 ## 前端处理示例 (JavaScript)
 
 ### 获取会话列表
@@ -311,12 +398,15 @@ conversations.forEach(conv => {
 
 ```javascript
 // 用户点击某个会话
-function onConversationClick(conversation) {
-  // 使用 sessionId 继续聊天
-  const { sessionId, title } = conversation;
+async function onConversationClick(conversation) {
+  const { id, sessionId, title } = conversation;
 
   // 显示会话标题
   setCurrentConversationTitle(title);
+
+  // 加载历史消息
+  const messages = await getConversationMessages(id);
+  renderMessages(messages);
 
   // 后续聊天使用该 sessionId
   await chatStream(sessionId, '继续我们的对话...');
@@ -353,7 +443,96 @@ const { content } = await getConversations();
 
 ---
 
-## 与 Chat API 的关系
+### 5. 获取会话消息历史
+
+获取指定会话的完整消息历史记录。
+
+**请求**
+
+```
+GET /api/conversations/{id}/messages
+```
+
+**路径参数**
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| id | number | 会话数据库ID |
+
+**请求示例**
+
+```
+GET /api/conversations/1/messages
+```
+
+**响应**
+
+| 状态码 | 说明 |
+|--------|------|
+| 200 | 成功返回消息列表 |
+| 404 | 会话不存在 |
+
+**响应数据**
+
+```json
+[
+  {
+    "id": 1,
+    "type": "USER",
+    "content": "Do I need a visa for Japan?",
+    "createdAt": "2024-01-20T10:00:00"
+  },
+  {
+    "id": 2,
+    "type": "AI",
+    "content": "Yes, most travelers need a visa...",
+    "createdAt": "2024-01-20T10:00:05"
+  },
+  {
+    "id": 3,
+    "type": "USER",
+    "content": "How long does it take?",
+    "createdAt": "2024-01-20T10:01:00"
+  }
+]
+```
+
+**响应字段说明**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | number | 消息ID |
+| type | string | 消息类型：USER（用户）、AI（助手）、SYSTEM（系统） |
+| content | string | 消息内容 |
+| createdAt | string | 创建时间（ISO 8601 格式） |
+
+---
+
+## 前端处理示例 (JavaScript)
+
+### 获取消息历史
+
+```javascript
+async function getConversationMessages(conversationId) {
+  const response = await fetch(`/api/conversations/${conversationId}/messages`);
+
+  if (!response.ok) {
+    throw new Error('获取消息历史失败');
+  }
+
+  return await response.json();
+}
+
+// 使用示例
+const messages = await getConversationMessages(1);
+console.log('消息历史:', messages);
+```
+
+---
+
+## 前端处理示例 (JavaScript)
+
+### 获取会话列表
 
 | 接口 | 用途 |
 |------|------|
