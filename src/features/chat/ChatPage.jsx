@@ -56,7 +56,7 @@ function QuoteDecoration() {
 export default function ChatPage() {
   const [conversations, setConversations] = useState([]);
   const [currentConversation, setCurrentConversation] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sidebarLoading, setSidebarLoading] = useState(false);
   const [sidebarError, setSidebarError] = useState(null); // Add error state
 
@@ -209,11 +209,11 @@ export default function ChatPage() {
       />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden w-full relative">
-        {/* Mobile Header Toggle */}
-        <div className="md:hidden absolute top-4 left-4 z-30">
+        {/* Header Toggle Button */}
+        <div className="absolute top-4 left-4 z-30">
           <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="p-2 bg-white rounded-lg shadow-sm border border-gray-200"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
           >
             <MenuIcon className="w-5 h-5 text-gray-600" />
           </button>
