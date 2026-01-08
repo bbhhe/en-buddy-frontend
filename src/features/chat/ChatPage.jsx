@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import ChatInput from './ChatInput';
 import MessageList from './MessageList';
 import ConversationSidebar from './ConversationSidebar';
@@ -59,6 +59,7 @@ export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sidebarLoading, setSidebarLoading] = useState(false);
   const [sidebarError, setSidebarError] = useState(null); // Add error state
+  const navigate = useNavigate();
 
   // Initialize useChat with current session ID
   const { messages, setMessages, sendMessage, isLoading, clearMemory } = useChat(
@@ -193,6 +194,25 @@ export default function ChatPage() {
   // Handle message sent - maybe refresh list to show updated preview/timestamp?
   // We can do this lazily or periodically. For now, let's not spam the API.
 
+  const handleGoToCoach = () => {
+    if (messages.length === 0) return;
+
+    // Format messages for the coach
+    const historyText = messages
+      .map(msg => {
+        const role = msg.role === 'user' ? 'User' : 'AI';
+        return `${role}: ${msg.content}`;
+      })
+      .join('\n\n');
+
+    navigate('/playground', {
+      state: {
+        initialHistory: historyText,
+        autoAnalyze: true
+      }
+    });
+  };
+
   return (
     <div className="flex h-screen bg-gray-50 font-sans text-gray-900">
       <ConversationSidebar
@@ -277,6 +297,27 @@ export default function ChatPage() {
                   >
                     Playground
                   </Link>
+                  <button
+                    onClick={handleGoToCoach}
+                    disabled={messages.length === 0}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                    style={{
+                      background: 'linear-gradient(135deg, var(--coral-500) 0%, var(--coral-600) 100%)',
+                      color: 'white',
+                      opacity: messages.length === 0 ? 0.5 : 1,
+                      cursor: messages.length === 0 ? 'not-allowed' : 'pointer',
+                      boxShadow: messages.length === 0 ? 'none' : '0 2px 8px rgba(217, 107, 79, 0.25)',
+                    }}
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 12h10" />
+                      <path d="M9 4l3 3-3 3" />
+                      <path d="M13 12h8" />
+                      <path d="M18 17l3-3-3-3" />
+                    </svg>
+                    <span className="hidden md:inline">AI 教练诊断</span>
+                    <span className="md:hidden">诊断</span>
+                  </button>
                 </div>
               </div>
 

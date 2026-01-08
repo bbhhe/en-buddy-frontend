@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useCoach, usePlaygroundHistory } from '../../hooks';
 import ChatHistoryInput from './ChatHistoryInput';
 import AnalysisDisplay from './AnalysisDisplay';
@@ -55,9 +55,30 @@ export default function PlaygroundPage() {
     clearCurrentRecord,
   } = usePlaygroundHistory();
 
+  const location = useLocation();
   const [chatHistory, setChatHistory] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const exportCardRef = useRef(null);
+
+  // Handle incoming analysis request
+  useEffect(() => {
+    if (location.state?.initialHistory) {
+      const history = location.state.initialHistory;
+      setChatHistory(history);
+
+      if (location.state.autoAnalyze) {
+        // Clear history state to prevent re-analysis on refresh
+        window.history.replaceState({}, document.title);
+
+        // Execute analysis
+        analyzeChat(history).then(result => {
+          if (result) {
+            saveRecord({ chatHistory: history, analysis: result });
+          }
+        });
+      }
+    }
+  }, [location.state, analyzeChat, saveRecord]);
 
   // Handle analysis
   const handleAnalyze = async () => {
