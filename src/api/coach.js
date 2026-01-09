@@ -40,8 +40,10 @@ export const analyzeStream = async (chatHistory, onChunk) => {
     for (const line of lines) {
       if (line.trim().startsWith('data:')) {
         const text = line.trim().slice(5);
-        fullContent += text;
-        onChunk?.(text, fullContent);
+        // 空的 data: 行表示换行符
+        const content = text === '' ? '\n' : text;
+        fullContent += content;
+        onChunk?.(content, fullContent);
       }
     }
   }
@@ -49,8 +51,9 @@ export const analyzeStream = async (chatHistory, onChunk) => {
   // Process any remaining buffer content
   if (buffer.trim().startsWith('data:')) {
     const text = buffer.trim().slice(5);
-    fullContent += text;
-    onChunk?.(text, fullContent);
+    const content = text === '' ? '\n' : text;
+    fullContent += content;
+    onChunk?.(content, fullContent);
   }
 
   return fullContent;
