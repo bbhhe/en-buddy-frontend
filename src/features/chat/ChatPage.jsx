@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import ChatInput from './ChatInput';
 import MessageList from './MessageList';
@@ -62,32 +62,14 @@ export default function ChatPage() {
   const navigate = useNavigate();
 
   // Initialize useChat with current session ID
-  const { messages, setMessages, sendMessage, isLoading, clearMemory } = useChat(
+  const { messages, setMessages, sendMessage, isLoading } = useChat(
     currentConversation?.sessionId || null
   );
 
   const messagesEndRef = useRef(null);
   const mainRef = useRef(null);
 
-  // Load conversations on mount
-  const refreshConversations = useCallback(async () => {
-    try {
-      setSidebarLoading(true);
-      setSidebarError(null);
-      const data = await getConversations(0, 50); // Fetch first 50 for now
-      setConversations(data.content);
 
-      // Select first conversation if none selected and not empty
-      if (!currentConversation && data.content.length > 0) {
-        handleSelectConversation(data.content[0]);
-      }
-    } catch (error) {
-      console.error('Failed to load conversations:', error);
-      setSidebarError(error); // Set error state
-    } finally {
-      setSidebarLoading(false);
-    }
-  }, [currentConversation]);
 
   useEffect(() => {
     // Initial load
@@ -287,6 +269,16 @@ export default function ChatPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <Link
+                    to="/vocabulary"
+                    className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hidden md:block"
+                    style={{
+                      color: 'var(--indigo-600)',
+                      background: 'var(--indigo-50)',
+                    }}
+                  >
+                    单词本
+                  </Link>
                   <Link
                     to="/playground"
                     className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hidden md:block"

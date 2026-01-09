@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useCoach, usePlaygroundHistory } from '../../hooks';
+import { analyzeAndSaveCards } from '../../api/vocabulary';
 import ChatHistoryInput from './ChatHistoryInput';
 import AnalysisDisplay from './AnalysisDisplay';
 import TakeawaySection from './TakeawaySection';
@@ -58,6 +59,7 @@ export default function PlaygroundPage() {
   const location = useLocation();
   const [chatHistory, setChatHistory] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isGeneratingCards, setIsGeneratingCards] = useState(false);
   const exportCardRef = useRef(null);
 
   // Handle incoming analysis request
@@ -85,6 +87,25 @@ export default function PlaygroundPage() {
     const result = await analyzeChat(chatHistory);
     if (result) {
       saveRecord({ chatHistory, analysis: result });
+    }
+  };
+
+  const handleGenerateCards = async () => {
+    if (!chatHistory.trim()) return;
+
+    setIsGeneratingCards(true);
+    try {
+      // Use a mock session ID or the one from current record if available
+      const sessionId = currentRecord?.id || 'temp-session-' + Date.now();
+      const result = await analyzeAndSaveCards(sessionId, chatHistory);
+
+      // Simple alert for now, ideally a Toast
+      alert(`Successfully saved ${result.savedCount} words to your Vocabulary Book!`);
+    } catch (error) {
+      console.error('Failed to generate cards:', error);
+      alert('Failed to generate cards. Please try again.');
+    } finally {
+      setIsGeneratingCards(false);
     }
   };
 
@@ -213,6 +234,31 @@ export default function PlaygroundPage() {
               isLoading={isAnalyzing}
               error={error}
             />
+
+            {/* Result Action Bar */}
+            {(analysis || currentRecord) && (
+              <div className="flex justify-end animate-fade-in">
+                <button
+                  onClick={handleGenerateCards}
+                  disabled={isGeneratingCards}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isGeneratingCards ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                      <span>Generate Word Cards</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
 
             {/* Takeaway Section - show only when there's an analysis */}
             {(analysis || currentRecord) && (
