@@ -3,7 +3,7 @@ FROM alibaba-cloud-linux-3-registry.cn-hangzhou.cr.aliyuncs.com/alinux3/node:20.
 WORKDIR /app
 
 # 安装 pnpm (利用 pnpm-lock.yaml 锁定依赖)
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN npm install -g pnpm
 
 # 复制依赖文件
 COPY package.json pnpm-lock.yaml ./
