@@ -1,7 +1,7 @@
 import api from './index';
 
 // Toggle this to false when backend is ready
-const ENABLE_MOCK = true;
+const ENABLE_MOCK = false;
 
 const mockCards = [
     {
@@ -61,7 +61,7 @@ export const getVocabularyList = async () => {
         await new Promise(resolve => setTimeout(resolve, 500));
         return mockCards;
     }
-    const response = await api.get('/api/vocabulary');
+    const response = await api.get('/api/vocabulary?userId=1');//userId 临时写成1
     return response.data;
 };
 
