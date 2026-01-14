@@ -51,7 +51,7 @@ export const analyzeAndSaveCards = async (sessionId, chatHistory) => {
             sessionId
         };
     }
-    const response = await api.post('/api/coach/analyze-cards', { sessionId, chatHistory });
+    const response = await api.post('/coach/analyze-cards', { sessionId, chatHistory });
     return response.data;
 };
 
@@ -61,7 +61,7 @@ export const getVocabularyList = async () => {
         await new Promise(resolve => setTimeout(resolve, 500));
         return mockCards;
     }
-    const response = await api.get('/api/vocabulary?userId=1');//userId 临时写成1
+    const response = await api.get('/vocabulary?userId=1');//userId 临时写成1
     return response.data;
 };
 
@@ -72,7 +72,7 @@ export const updateCardStatus = async (id, status) => {
         if (card) card.status = status;
         return card;
     }
-    const response = await api.put(`/api/vocabulary/${id}/status`, { status });
+    const response = await api.put(`/vocabulary/${id}/status`, { status });
     return response.data;
 };
 
@@ -81,6 +81,6 @@ export const deleteCard = async (id) => {
         console.log('Mocking deleteCard:', id);
         return true;
     }
-    const response = await api.delete(`/api/vocabulary/${id}`);
+    const response = await api.delete(`/vocabulary/${id}`);
     return response.data;
 }

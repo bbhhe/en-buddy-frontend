@@ -6,6 +6,6 @@ import api from './index';
  * @returns {Promise<{translatedText: string, sourceLanguage: string, targetLanguage: string}>}
  */
 export const translateText = async (text) => {
-    const response = await api.post('/api/translation/translate', { text });
+    const response = await api.post('/translation/translate', { text });
     return response.data;
 };

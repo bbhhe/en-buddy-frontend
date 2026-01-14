@@ -7,7 +7,7 @@ import { API_BASE_URL } from './index';
  * @returns {Promise<string>} - 完整的分析结果
  */
 export const analyzeStream = async (chatHistory, onChunk) => {
-  const response = await fetch(`${API_BASE_URL}/api/coach/analyze`, {
+  const response = await fetch(`${API_BASE_URL}/coach/analyze`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

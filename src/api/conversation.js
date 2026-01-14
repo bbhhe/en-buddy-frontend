@@ -6,7 +6,7 @@ import api from './index';
  * @param {number} size Page size
  */
 export const getConversations = async (page = 0, size = 20) => {
-    const response = await api.get(`/api/conversations?page=${page}&size=${size}`);
+    const response = await api.get(`/conversations?page=${page}&size=${size}`);
     return response.data;
 };
 
@@ -15,7 +15,7 @@ export const getConversations = async (page = 0, size = 20) => {
  * @param {string} title Optional title
  */
 export const createConversation = async (title = null) => {
-    const response = await api.post('/api/conversations', title ? { title } : {});
+    const response = await api.post('/conversations', title ? { title } : {});
     return response.data;
 };
 
@@ -24,7 +24,7 @@ export const createConversation = async (title = null) => {
  * @param {number} id Conversation database ID
  */
 export const deleteConversation = async (id) => {
-    await api.delete(`/api/conversations/${id}`);
+    await api.delete(`/conversations/${id}`);
 };
 
 /**
@@ -33,7 +33,7 @@ export const deleteConversation = async (id) => {
  * @param {string} title New title
  */
 export const renameConversation = async (id, title) => {
-    await api.put(`/api/conversations/${id}/title`, { title });
+    await api.put(`/conversations/${id}/title`, { title });
 };
 
 /**
@@ -41,6 +41,6 @@ export const renameConversation = async (id, title) => {
  * @param {number} id Conversation database ID
  */
 export const getConversationMessages = async (id) => {
-    const response = await api.get(`/api/conversations/${id}/messages`);
+    const response = await api.get(`/conversations/${id}/messages`);
     return response.data;
 };

@@ -1,7 +1,7 @@
 import api, { API_BASE_URL } from './index';
 
 export const chatStream = async (sessionId, message, onChunk) => {
-  const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
+  const response = await fetch(`${API_BASE_URL}/chat/stream`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -45,10 +45,10 @@ export const chatStream = async (sessionId, message, onChunk) => {
 };
 
 export const clearMemory = async (sessionId) => {
-  return api.delete(`/api/chat/memory/${sessionId}`);
+  return api.delete(`/chat/memory/${sessionId}`);
 };
 
 export const sendMessage = async (message) => {
-  const response = await api.post('/api/chat', { message });
+  const response = await api.post('/chat', { message });
   return response.data;
 };
