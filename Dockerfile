@@ -3,15 +3,15 @@ FROM alibaba-cloud-linux-3-registry.cn-hangzhou.cr.aliyuncs.com/alinux3/node:20.
 WORKDIR /app
 
 # 安装 pnpm (利用 pnpm-lock.yaml 锁定依赖)
-RUN npm install -g pnpm
+# RUN npm install -g pnpm
 
 # 复制依赖文件
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+# RUN pnpm install --frozen-lockfile
 
 # 构建应用
 COPY . .
-RUN pnpm run build
+RUN npm run build
 
 # 运行阶段 - 使用 nginx 托管静态文件
 FROM anolis-registry.cn-zhangjiakou.cr.aliyuncs.com/openanolis/nginx:1.14.1-8.6
